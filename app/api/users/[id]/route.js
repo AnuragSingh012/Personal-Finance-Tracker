@@ -5,7 +5,10 @@ export async function GET(req, { params }) {
   try {
     await connectDB();
 
-    const user = await User.findById(params.id)
+    // Ensure params are awaited before using
+    const { id } = await params;
+
+    const user = await User.findById(id).populate("transactions");
 
     if (!user) {
       return new Response(JSON.stringify({ message: "User not found" }), { status: 404 });

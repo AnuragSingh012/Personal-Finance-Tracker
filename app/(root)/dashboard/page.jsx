@@ -3,9 +3,9 @@
 import TransactionCard from "@/components/TransactionCard";
 import RecentTransaction from "@/components/RecentTransaction";
 import Statistics from "@/components/Statistics";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getUserFromLocalStorage } from "@/utils/localStorage";
+import AddTransaction from "@/components/AddTransaction";
 
 export default function Home() {
   const { userId } = getUserFromLocalStorage(); 
@@ -40,6 +40,9 @@ export default function Home() {
       <section className="my-8">
         <h1 className="text-4xl">Welcome, {user.name}</h1>
         <p>This is your Personal Finance Tracker</p>
+      </section>
+      <section>
+        <AddTransaction />
       </section>
       <section>
         <h2 className="text-3xl font-bold">Dashboard</h2>

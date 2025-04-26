@@ -17,7 +17,7 @@ const Statistics = ({ user }) => {
   return (
     <div className='flex flex-col flex-1 bg-[#0d1424] px-12 py-4 rounded-2xl text-white'>
       <div className='text-xl font-semibold mb-4'>Your Statistics</div>
-      {income>0 && expenses>0 ? (
+      {income>0 || expenses>0 ? (
         <div className='flex justify-center items-center'>
               <PieChart width={350} height={350}>
         <Pie
