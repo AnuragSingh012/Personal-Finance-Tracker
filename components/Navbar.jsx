@@ -11,7 +11,7 @@ const Navbar = () => {
   return (
     <nav className="w-full text-white">
       <div className="flex flex-col sm:flex-row justify-between items-center py-4 px-6 sm:px-10 gap-4">
-        <div className="text-2xl font-bold">Logo</div>
+        <div className="text-2xl font-bold"><Link href="/dashboard">Logo</Link></div>
 
         {/* Hamburger Menu Button */}
         <button

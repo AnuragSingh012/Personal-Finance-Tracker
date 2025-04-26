@@ -1,46 +1,58 @@
 'use client';
 
 import React from 'react';
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip
-} from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import Link from 'next/link';
 
-const data = [
-  { name: 'Jan', uv: 400, pv: 240, zv: 299},
-  { name: 'Feb', uv: 300, pv: 139, zv: 539},
-  { name: 'Mar', uv: 200, pv: 980, zv: 649},
-  { name: 'Apr', uv: 278, pv: 390, zv: 709},
-  { name: 'May', uv: 189, pv: 480, zv: 909},
-];
+const COLORS = ['#00C49F', '#FF8042'];
 
-const Statistics = () => {
+const Statistics = ({ user }) => {
+  const { income = 0, expenses = 0 } = user || {};
+
+  const data = [
+    { name: 'Income', value: income },
+    { name: 'Expenses', value: expenses },
+  ];
+
   return (
-    <div className='flex flex-col flex-1 bg-[#0b100e] px-12 py-4 rounded-2xl text-white'>
-      <div className='flex flex-1/4 px-4 py-4 rounded-2xl'>Your Statistics</div>
-      <AreaChart width={730} height={250} data={data}
-        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-        <defs>
-          <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
-          </linearGradient>
-          <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#82ca9d" stopOpacity={0}/>
-          </linearGradient>
-          <linearGradient id="colorZv" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#ff0000" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#ffff00" stopOpacity={0}/>
-          </linearGradient>
-        </defs>
-        <XAxis dataKey="name" />
-        <YAxis />
-        <CartesianGrid strokeDasharray="3 3" />
+    <div className='flex flex-col flex-1 bg-[#0d1424] px-12 py-4 rounded-2xl text-white'>
+      <div className='text-xl font-semibold mb-4'>Your Statistics</div>
+      {income>0 && expenses>0 ? (
+        <div className='flex justify-center items-center'>
+              <PieChart width={350} height={350}>
+        <Pie
+          data={data}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          outerRadius={100}
+          fill="#8884d8"
+          dataKey="value"
+          nameKey="name"
+        >
+          {data.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Pie>
         <Tooltip />
-        <Area type="monotone" dataKey="uv" stroke="#8884d8" fillOpacity={1} fill="url(#colorUv)" />
-        <Area type="monotone" dataKey="pv" stroke="#82ca9d" fillOpacity={1} fill="url(#colorPv)" />
-        <Area type="monotone" dataKey="zv" stroke="#ff0000" fillOpacity={1} fill="url(#colorZv)" />
-      </AreaChart>
+        <Legend />
+      </PieChart>
+        </div>
+      ): (
+        <div className='w-full h-full flex flex-col items-center justify-center text-center space-y-2'>
+  <div className='text-red-400 font-semibold'>
+    Looks a bit empty here!
+  </div>
+  <div className='text-gray-300'>
+    Add some income or expenses to see your stats grow 📈
+  </div>
+  <div className='text-green-400'>
+    Head over to the <span className="underline text-blue-600"><Link href="/transactions">Transactions</Link></span> page from the navbar.
+  </div>
+</div>
+
+      )}
+      
     </div>
   );
 };
