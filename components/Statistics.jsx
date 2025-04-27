@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
-import Link from 'next/link';
 
 const COLORS = ['#00C49F', '#FF8042'];
 
@@ -45,9 +44,6 @@ const Statistics = ({ user }) => {
   </div>
   <div className='text-gray-300'>
     Add some income or expenses to see your stats grow 📈
-  </div>
-  <div className='text-green-400'>
-    Head over to the <span className="underline text-blue-600"><Link href="/transactions">Transactions</Link></span> page from the navbar.
   </div>
 </div>
 

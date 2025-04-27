@@ -29,7 +29,7 @@ const CategoryChart = ({ user }) => {
   }));
 
   return (
-    <div className="w-full mb-40 px-6 py-6 mt-8 bg-[#0d1424] rounded-2xl shadow-lg">
+    <div className="w-full mb-10 px-6 py-6 mt-8 bg-[#0d1424] rounded-2xl shadow-lg">
       <div className="text-white text-xl font-semibold mb-4">Category Statistics</div>
       <ResponsiveContainer width="100%" height={300}>
         <AreaChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>

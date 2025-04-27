@@ -8,6 +8,7 @@ import { getUserFromLocalStorage } from "@/utils/localStorage";
 import AddTransaction from "@/components/AddTransaction";
 import CategoryChart from "@/components/CategoryChart";
 import SetBudget from "@/components/SetBudget";
+import BudgetChart from "@/components/BudgetChart";
 
 export default function Home() {
   const { userId } = getUserFromLocalStorage(); 
@@ -44,7 +45,7 @@ export default function Home() {
       </section>
       <section className="flex gap-2">
         <AddTransaction refreshUser={fetchUser} />
-        <SetBudget />
+        <SetBudget refreshUser={fetchUser} />
       </section>
       <section>
         <h2 className="text-3xl font-bold">Dashboard</h2>
@@ -61,6 +62,11 @@ export default function Home() {
       <section>
         <div className="flex justify-center items-center">
             <CategoryChart user={user} />
+        </div>
+      </section>
+      <section>
+        <div className="flex justify-center items-center">
+            <BudgetChart user={user} />
         </div>
       </section>
     </div>

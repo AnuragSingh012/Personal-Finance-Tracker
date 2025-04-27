@@ -12,9 +12,9 @@ const TransactionCard = ({ user }) => {
   const balance = income - expenses;
 
   const getAmountColor = (amount) => {
-    if (amount > 0) return 'text-green-500'; // Positive amount (green)
-    if (amount < 0) return 'text-red-500'; // Negative amount (red)
-    return 'text-gray-500'; // Neutral amount (gray)
+    if (amount > 0) return 'text-green-500';
+    if (amount < 0) return 'text-red-500';
+    return 'text-gray-500';
   };
 
   return (

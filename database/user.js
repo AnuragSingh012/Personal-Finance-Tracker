@@ -1,17 +1,22 @@
 import mongoose from 'mongoose';
 import Transaction from './transactions';
 
+const categorySchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  amount: { type: Number, default: 0 },
+}, { _id: false });
+
+const budgetSchema = new mongoose.Schema({
+  month: { type: String, required: true },
+  categories: [categorySchema],
+  totalAmount: { type: Number, default: 0 },
+}, { _id: false });
+
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   income: { type: Number, default: 0 },
   expenses: { type: Number, default: 0 },
-  budget: [
-    {
-      category: { type: String, required: true },
-      amount: { type: Number, required: true },
-      month: { type: String, required: true }, // Store the month for each budget
-    }
-  ],
+  budget: [budgetSchema],
   transactions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Transaction' }],
 }, { timestamps: true });
 

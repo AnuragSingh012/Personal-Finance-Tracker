@@ -66,7 +66,6 @@ const AddTransaction = ({ refreshUser }) => {
       const data = await response.json();
   
       if (response.ok) {
-        // Reset form state after successful submission
         setCategory("");
         setCustomCategory("");
         setAmount("");
@@ -90,7 +89,7 @@ const AddTransaction = ({ refreshUser }) => {
     <div className="my-6">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button className="bg-black text-white border-0 cursor-pointer" variant="outline">
+          <Button className="bg-black text-white cursor-pointer" variant="outline">
             + Add New Transaction
           </Button>
         </AlertDialogTrigger>
@@ -104,7 +103,6 @@ const AddTransaction = ({ refreshUser }) => {
           </AlertDialogHeader>
 
           <div className="space-y-4 px-4 py-6">
-            {/* Category Field */}
             <div className="flex flex-col">
               <label htmlFor="category" className="text-sm text-white">Category</label>
               <select
@@ -122,7 +120,6 @@ const AddTransaction = ({ refreshUser }) => {
               </select>
             </div>
 
-            {/* If user selects "Other", show custom input */}
             {category === "Other" && (
               <div className="flex flex-col">
                 <label htmlFor="customCategory" className="text-sm text-white">Custom Category</label>
@@ -137,7 +134,6 @@ const AddTransaction = ({ refreshUser }) => {
               </div>
             )}
 
-            {/* Amount Field */}
             <div className="flex flex-col">
               <label htmlFor="amount" className="text-sm text-white">Amount</label>
               <input
@@ -150,7 +146,6 @@ const AddTransaction = ({ refreshUser }) => {
               />
             </div>
 
-            {/* Payee Field */}
             <div className="flex flex-col">
               <label htmlFor="payee" className="text-sm text-white">Payee</label>
               <input
@@ -163,7 +158,6 @@ const AddTransaction = ({ refreshUser }) => {
               />
             </div>
 
-            {/* Type Field */}
             <div className="flex flex-col">
               <label htmlFor="type" className="text-sm text-white">Type</label>
               <select

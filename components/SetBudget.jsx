@@ -1,17 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
 const SetBudget = ({ refreshUser }) => {
@@ -19,83 +9,62 @@ const SetBudget = ({ refreshUser }) => {
   const [customCategory, setCustomCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // Predefined categories
-  const predefinedCategories = [
-    "Salary",
-    "Grocery",
-    "Rent",
-    "Entertainment",
-    "Investment",
-    "Other",
-  ];
-
   const [currentMonth, setCurrentMonth] = useState("");
-  const [userBudgets, setUserBudgets] = useState([]);
 
-  // Set the current month
+  const predefinedCategories = ["Salary", "Grocery", "Rent", "Entertainment", "Investment", "Other"];
+
   useEffect(() => {
-    const month = new Date().toLocaleString('default', { month: 'long' }); // Get the current month
+    const month = new Date().toLocaleString('default', { month: 'long' });
     setCurrentMonth(month);
   }, []);
 
   const handleSubmit = async () => {
-    const userId = localStorage.getItem("userId");
+    if (!category || !amount) {
+      alert("Please fill in all fields.");
+      return;
+    }
 
+    const userId = localStorage.getItem("userId");
     if (!userId) {
       alert("User not found. Please login.");
       return;
     }
 
-    const finalCategory = category === "Other" ? customCategory : category;
-
-    if (!finalCategory || !amount) {
-      alert("Please fill in all fields.");
+    const finalCategory = category === "Other" ? customCategory.trim() : category;
+    if (!finalCategory) {
+      alert("Please enter a custom category name.");
       return;
     }
 
-    // Check if the budget for the category already exists
-    const existingBudgetIndex = userBudgets.findIndex(
-      (budget) => budget.category === finalCategory && budget.month === currentMonth
-    );
-
-    let updatedBudgets = [...userBudgets];
-
-    if (existingBudgetIndex === -1) {
-      // If the category is not found, add a new budget entry
-      updatedBudgets.push({
-        category: finalCategory,
-        amount: parseFloat(amount),
-        month: currentMonth,
-      });
-    } else {
-      // If the category already exists for the month, update the budget
-      updatedBudgets[existingBudgetIndex].amount = parseFloat(amount);
+    const numericAmount = parseFloat(amount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      alert("Please enter a valid amount.");
+      return;
     }
 
     setLoading(true);
 
     try {
       const response = await fetch("/api/budget", {
-        method: "POST",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, budgets: updatedBudgets }),
+        body: JSON.stringify({ userId, month: currentMonth, category: finalCategory, amount: numericAmount }),
       });
 
       const data = await response.json();
-
       if (response.ok) {
+        alert("Budget updated successfully!");
         setCategory("");
         setCustomCategory("");
         setAmount("");
-        setLoading(false);
-        alert("Budget set successfully!");
+        refreshUser();
       } else {
-        alert(data.message || "Error setting budget.");
+        alert(data.message || "Failed to update budget.");
       }
     } catch (error) {
       console.error(error);
       alert("Something went wrong.");
+    } finally {
       setLoading(false);
     }
   };
@@ -104,7 +73,7 @@ const SetBudget = ({ refreshUser }) => {
     <div className="my-6">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button className="bg-black text-white border-0 cursor-pointer" variant="outline">
+          <Button className="bg-black text-white" variant="outline">
             Set Monthly Budget
           </Button>
         </AlertDialogTrigger>
@@ -112,9 +81,7 @@ const SetBudget = ({ refreshUser }) => {
         <AlertDialogContent className="bg-[#0d1424]">
           <AlertDialogHeader>
             <AlertDialogTitle>Set Monthly Budget</AlertDialogTitle>
-            <AlertDialogDescription>
-              Please enter the details of the monthly budget.
-            </AlertDialogDescription>
+            <AlertDialogDescription>Fill in the budget details below.</AlertDialogDescription>
           </AlertDialogHeader>
 
           <div className="space-y-4 px-4 py-6">
@@ -127,10 +94,8 @@ const SetBudget = ({ refreshUser }) => {
                 className="mt-1 p-2 rounded-md bg-[#1b2a3a] text-white"
               >
                 <option value="">Select category</option>
-                {predefinedCategories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
+                {predefinedCategories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
             </div>
@@ -163,10 +128,8 @@ const SetBudget = ({ refreshUser }) => {
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-white text-black cursor-pointer">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction className="cursor-pointer" onClick={handleSubmit}>
+            <AlertDialogCancel className="bg-white text-black">Cancel</AlertDialogCancel>
+            <AlertDialogAction disabled={loading} onClick={handleSubmit} className="cursor-pointer">
               {loading ? "Submitting..." : "Submit"}
             </AlertDialogAction>
           </AlertDialogFooter>

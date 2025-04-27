@@ -18,25 +18,31 @@ import { saveUserToLocalStorage } from "@/utils/localStorage";
 
 export default function Home() {
   const [name, setName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+    setSubmitting(true);
+
     const res = await fetch("/api/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
     });
-  
-    const responseData = await res.json();             
-  
+
+    const responseData = await res.json();
+
     if (res.ok) {
       saveUserToLocalStorage(responseData.user._id, responseData.user.name);
+      setIsDialogOpen(false);
       router.push("/dashboard");
+    } else {
+      setSubmitting(false);
     }
   };
-  
+
   return (
     <div className="relative px-6 min-h-screen w-full bg-[#000319] overflow-hidden">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#000319_1px,transparent_1px),linear-gradient(to_bottom,#000319_1px,transparent_1px)] bg-[size:14px_24px]"></div>
@@ -55,15 +61,27 @@ export default function Home() {
         </header>
 
         <section className="flex justify-center items-center mt-10 w-full max-w-md">
-          <AlertDialog>
-            <AlertDialogTrigger className="bg-[#000319] border border-white px-6 py-3 rounded-lg cursor-pointer font-medium text-white shadow-lg hover:bg-[#434343]">
+          <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <AlertDialogTrigger
+              className="bg-[#000319] border border-white px-6 py-3 rounded-lg cursor-pointer font-medium text-white shadow-lg hover:bg-[#434343]"
+              onClick={() => setIsDialogOpen(true)}
+            >
               Get Started
             </AlertDialogTrigger>
             <AlertDialogContent className="bg-[#000319] text-white border-0 max-w-sm w-full p-6 rounded-lg shadow-xl">
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-xl font-semibold">
+                  Welcome! 🚀
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-sm text-gray-400 mt-2">
+                  Enter your Name
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+
+              <form onSubmit={handleSubmit} className="space-y-6 mt-4">
                 <div className="flex flex-col space-y-3">
                   <label className="block text-sm font-medium text-white">
-                    Enter your name:
+                    Your Name:
                   </label>
                   <input
                     type="text"
@@ -76,9 +94,9 @@ export default function Home() {
                 <AlertDialogAction
                   type="submit"
                   className="w-full bg-white text-black hover:bg-[#cec2c2] cursor-pointer py-3 rounded-lg"
-                  disabled={!name.trim()}
+                  disabled={!name.trim() || submitting}
                 >
-                  Go to Dashboard
+                  {submitting ? "Submitting..." : "Go to Dashboard"}
                 </AlertDialogAction>
               </form>
             </AlertDialogContent>
