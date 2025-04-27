@@ -2,11 +2,18 @@ import mongoose from "mongoose";
 
 export const connectDB = async () => {
   try {
-    if (mongoose.connections[0].readyState) return;
-    await mongoose.connect("mongodb://localhost:27017/finance-tracker", {
+    const mongoURI = process.env.MONGODB_URI;
+    
+    if (!mongoURI) {
+      console.error("MongoDB URI is not defined in the environment variables");
+      process.exit(1);
+    }
+
+    await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+
     console.log("MongoDB Connected 🚀");
   } catch (error) {
     console.error("MongoDB connection error:", error);

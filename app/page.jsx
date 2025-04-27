@@ -96,7 +96,13 @@ export default function Home() {
                   className="w-full bg-white text-black hover:bg-[#cec2c2] cursor-pointer py-3 rounded-lg"
                   disabled={!name.trim() || submitting}
                 >
-                  {submitting ? "Submitting..." : "Go to Dashboard"}
+                  {submitting ? (
+                    <span className="flex justify-center items-center">
+                      <div className="w-5 h-5 border-4 border-t-4 border-gray-600 rounded-full animate-spin"></div>
+                    </span>
+                  ) : (
+                    "Go to Dashboard"
+                  )}
                 </AlertDialogAction>
               </form>
             </AlertDialogContent>
