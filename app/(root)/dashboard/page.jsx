@@ -32,7 +32,7 @@ export default function Home() {
   if (!user) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <p className="text-white">Loading...</p>
+        <p className="text-white text-4xl">Loading...</p>
       </div>
     );
   }

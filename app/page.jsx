@@ -20,11 +20,13 @@ export default function Home() {
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+    setIsLoading(true);
 
     const res = await fetch("/api/users", {
       method: "POST",
@@ -37,9 +39,12 @@ export default function Home() {
     if (res.ok) {
       saveUserToLocalStorage(responseData.user._id, responseData.user.name);
       setIsDialogOpen(false);
-      router.push("/dashboard");
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 500);
     } else {
       setSubmitting(false);
+      setIsLoading(false);
     }
   };
 
@@ -60,54 +65,60 @@ export default function Home() {
           </h2>
         </header>
 
-        <section className="flex justify-center items-center mt-10 w-full max-w-md">
-          <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <AlertDialogTrigger
-              className="bg-[#000319] border border-white px-6 py-3 rounded-lg cursor-pointer font-medium text-white shadow-lg hover:bg-[#434343]"
-              onClick={() => setIsDialogOpen(true)}
-            >
-              Get Started
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-[#000319] text-white border-0 max-w-sm w-full p-6 rounded-lg shadow-xl">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="text-xl font-semibold">
-                  Welcome! 🚀
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-sm text-gray-400 mt-2">
-                  Enter your Name
-                </AlertDialogDescription>
-              </AlertDialogHeader>
+        {isLoading ? (
+          <div className="flex justify-center items-center w-full h-full bg-opacity-50 bg-[#000319] absolute top-0 left-0 z-20">
+            <div className="text-white text-4xl">Loading... Please wait</div>
+          </div>
+        ) : (
+          <section className="flex justify-center items-center mt-10 w-full max-w-md">
+            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <AlertDialogTrigger
+                className="bg-[#000319] border border-white px-6 py-3 rounded-lg cursor-pointer font-medium text-white shadow-lg hover:bg-[#434343]"
+                onClick={() => setIsDialogOpen(true)}
+              >
+                Get Started
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-[#000319] text-white border-0 max-w-sm w-full p-6 rounded-lg shadow-xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-xl font-semibold">
+                    Welcome! 🚀
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="text-sm text-gray-400 mt-2">
+                    Enter your Name
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
 
-              <form onSubmit={handleSubmit} className="space-y-6 mt-4">
-                <div className="flex flex-col space-y-3">
-                  <label className="block text-sm font-medium text-white">
-                    Your Name:
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 border rounded-md bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </div>
-                <AlertDialogAction
-                  type="submit"
-                  className="w-full bg-white text-black hover:bg-[#cec2c2] cursor-pointer py-3 rounded-lg"
-                  disabled={!name.trim() || submitting}
-                >
-                  {submitting ? (
-                    <span className="flex justify-center items-center">
-                      <div className="w-5 h-5 border-4 border-t-4 border-gray-600 rounded-full animate-spin"></div>
-                    </span>
-                  ) : (
-                    "Go to Dashboard"
-                  )}
-                </AlertDialogAction>
-              </form>
-            </AlertDialogContent>
-          </AlertDialog>
-        </section>
+                <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+                  <div className="flex flex-col space-y-3">
+                    <label className="block text-sm font-medium text-white">
+                      Your Name:
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-4 py-3 border rounded-md bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <AlertDialogAction
+                    type="submit"
+                    className="w-full bg-white text-black hover:bg-[#cec2c2] cursor-pointer py-3 rounded-lg"
+                    disabled={!name.trim() || submitting}
+                  >
+                    {submitting ? (
+                      <span className="flex justify-center items-center">
+                        <div className="w-5 h-5 border-4 border-t-4 border-gray-600 rounded-full animate-spin"></div>
+                      </span>
+                    ) : (
+                      "Go to Dashboard"
+                    )}
+                  </AlertDialogAction>
+                </form>
+              </AlertDialogContent>
+            </AlertDialog>
+          </section>
+        )}
       </div>
     </div>
   );
