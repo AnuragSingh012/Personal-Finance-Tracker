@@ -6,24 +6,25 @@ import Statistics from "@/components/Statistics";
 import { useEffect, useState } from "react";
 import { getUserFromLocalStorage } from "@/utils/localStorage";
 import AddTransaction from "@/components/AddTransaction";
+import CategoryChart from "@/components/CategoryChart";
+import SetBudget from "@/components/SetBudget";
 
 export default function Home() {
   const { userId } = getUserFromLocalStorage(); 
   const [user, setUser] = useState(null);
 
+  const fetchUser = async () => {
+    try {
+      const res = await fetch(`/api/users/${userId}`);
+      const data = await res.json();
+      setUser(data.user);
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
+    }
+  };
+
   useEffect(() => {
     if (!userId) return;
-
-    const fetchUser = async () => {
-      try {
-        const res = await fetch(`/api/users/${userId}`);
-        const data = await res.json();
-        setUser(data.user);
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-      }
-    };
-
     fetchUser();
   }, [userId]);
 
@@ -41,8 +42,9 @@ export default function Home() {
         <h1 className="text-4xl">Welcome, {user.name}</h1>
         <p>This is your Personal Finance Tracker</p>
       </section>
-      <section>
-        <AddTransaction />
+      <section className="flex gap-2">
+        <AddTransaction refreshUser={fetchUser} />
+        <SetBudget />
       </section>
       <section>
         <h2 className="text-3xl font-bold">Dashboard</h2>
@@ -54,6 +56,11 @@ export default function Home() {
         <div className="flex flex-wrap gap-10 justify-between py-6">
           <RecentTransaction transactions={user.transactions} />
           <Statistics user={user} />
+        </div>
+      </section>
+      <section>
+        <div className="flex justify-center items-center">
+            <CategoryChart user={user} />
         </div>
       </section>
     </div>

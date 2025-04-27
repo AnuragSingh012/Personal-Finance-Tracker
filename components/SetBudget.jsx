@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,14 +14,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
-const AddTransaction = ({ refreshUser }) => {
+const SetBudget = ({ refreshUser }) => {
   const [category, setCategory] = useState("");
   const [customCategory, setCustomCategory] = useState("");
   const [amount, setAmount] = useState("");
-  const [payee, setPayee] = useState("");
-  const [type, setType] = useState("income");
   const [loading, setLoading] = useState(false);
 
+  // Predefined categories
   const predefinedCategories = [
     "Salary",
     "Grocery",
@@ -31,80 +30,94 @@ const AddTransaction = ({ refreshUser }) => {
     "Other",
   ];
 
+  const [currentMonth, setCurrentMonth] = useState("");
+  const [userBudgets, setUserBudgets] = useState([]);
+
+  // Set the current month
+  useEffect(() => {
+    const month = new Date().toLocaleString('default', { month: 'long' }); // Get the current month
+    setCurrentMonth(month);
+  }, []);
+
   const handleSubmit = async () => {
     const userId = localStorage.getItem("userId");
-  
+
     if (!userId) {
       alert("User not found. Please login.");
       return;
     }
-  
+
     const finalCategory = category === "Other" ? customCategory : category;
-  
-    if (!finalCategory || !amount || !payee) {
+
+    if (!finalCategory || !amount) {
       alert("Please fill in all fields.");
       return;
     }
-  
-    const transactionData = {
-      userId,
-      category: finalCategory,
-      amount,
-      payee,
-      type,
-    };
-  
+
+    // Check if the budget for the category already exists
+    const existingBudgetIndex = userBudgets.findIndex(
+      (budget) => budget.category === finalCategory && budget.month === currentMonth
+    );
+
+    let updatedBudgets = [...userBudgets];
+
+    if (existingBudgetIndex === -1) {
+      // If the category is not found, add a new budget entry
+      updatedBudgets.push({
+        category: finalCategory,
+        amount: parseFloat(amount),
+        month: currentMonth,
+      });
+    } else {
+      // If the category already exists for the month, update the budget
+      updatedBudgets[existingBudgetIndex].amount = parseFloat(amount);
+    }
+
     setLoading(true);
-  
+
     try {
-      const response = await fetch("/api/transactions", {
+      const response = await fetch("/api/budget", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(transactionData),
+        body: JSON.stringify({ userId, budgets: updatedBudgets }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
-        // Reset form state after successful submission
         setCategory("");
         setCustomCategory("");
         setAmount("");
-        setPayee("");
-        setType("income");
-  
-        refreshUser();
+        setLoading(false);
+        alert("Budget set successfully!");
       } else {
-        alert(data.message || "Error adding transaction.");
+        alert(data.message || "Error setting budget.");
       }
     } catch (error) {
       console.error(error);
       alert("Something went wrong.");
-    } finally {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="my-6">
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button className="bg-black text-white border-0 cursor-pointer" variant="outline">
-            + Add New Transaction
+            Set Monthly Budget
           </Button>
         </AlertDialogTrigger>
 
         <AlertDialogContent className="bg-[#0d1424]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Add New Transaction</AlertDialogTitle>
+            <AlertDialogTitle>Set Monthly Budget</AlertDialogTitle>
             <AlertDialogDescription>
-              Please enter the details of the new transaction below.
+              Please enter the details of the monthly budget.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <div className="space-y-4 px-4 py-6">
-            {/* Category Field */}
             <div className="flex flex-col">
               <label htmlFor="category" className="text-sm text-white">Category</label>
               <select
@@ -122,7 +135,6 @@ const AddTransaction = ({ refreshUser }) => {
               </select>
             </div>
 
-            {/* If user selects "Other", show custom input */}
             {category === "Other" && (
               <div className="flex flex-col">
                 <label htmlFor="customCategory" className="text-sm text-white">Custom Category</label>
@@ -137,7 +149,6 @@ const AddTransaction = ({ refreshUser }) => {
               </div>
             )}
 
-            {/* Amount Field */}
             <div className="flex flex-col">
               <label htmlFor="amount" className="text-sm text-white">Amount</label>
               <input
@@ -148,33 +159,6 @@ const AddTransaction = ({ refreshUser }) => {
                 placeholder="Enter amount"
                 className="mt-1 p-2 rounded-md bg-[#1b2a3a] text-white"
               />
-            </div>
-
-            {/* Payee Field */}
-            <div className="flex flex-col">
-              <label htmlFor="payee" className="text-sm text-white">Payee</label>
-              <input
-                type="text"
-                id="payee"
-                value={payee}
-                onChange={(e) => setPayee(e.target.value)}
-                placeholder="Enter payee name"
-                className="mt-1 p-2 rounded-md bg-[#1b2a3a] text-white"
-              />
-            </div>
-
-            {/* Type Field */}
-            <div className="flex flex-col">
-              <label htmlFor="type" className="text-sm text-white">Type</label>
-              <select
-                id="type"
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                className="mt-1 p-2 rounded-md bg-[#1b2a3a] text-white"
-              >
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-              </select>
             </div>
           </div>
 
@@ -192,4 +176,4 @@ const AddTransaction = ({ refreshUser }) => {
   );
 };
 
-export default AddTransaction;
+export default SetBudget;
